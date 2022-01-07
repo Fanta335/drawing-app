@@ -6,13 +6,14 @@ const App = () => {
   const [size, setSize] = React.useState(5);
   const [color, setColor] = React.useState("#000000");
   const [lines, setLines] = React.useState([]);
+  // const [history, setHistory] = React.useState([]);
   const isDrawing = React.useRef(false);
   const stageRef = React.useRef(null);
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
     const pos = e.target.getStage().getPointerPosition();
-    setLines([...lines, { tool, points: [pos.x, pos.y], size, color }]);
+    setLines([...lines, { tool, points: [pos.x, pos.y, pos.x, pos.y], size, color }]);
   };
 
   const handleMouseMove = (e) => {
@@ -34,6 +35,10 @@ const App = () => {
   const handleMouseUp = () => {
     isDrawing.current = false;
   };
+
+  const clearCanvas = () => {
+    setLines([]);
+  }
 
   const downloadURI = (uri, name) => {
     const link = document.createElement("a");
@@ -93,6 +98,7 @@ const App = () => {
       />
       <label htmlFor="color">Color</label>
       <button onClick={handleExport}>Save image</button>
+      <button onClick={clearCanvas}>Clear</button>
       <Stage
         width={500}
         height={500}
