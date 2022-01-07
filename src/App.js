@@ -7,6 +7,7 @@ const App = () => {
   const [color, setColor] = React.useState("#000000");
   const [lines, setLines] = React.useState([]);
   const isDrawing = React.useRef(false);
+  const stageRef = React.useRef(null);
 
   const handleMouseDown = (e) => {
     isDrawing.current = true;
@@ -32,6 +33,32 @@ const App = () => {
 
   const handleMouseUp = () => {
     isDrawing.current = false;
+  };
+
+  const downloadURI = (uri, name) => {
+    const link = document.createElement("a");
+    link.download = name;
+    link.href = uri;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const formatDate = (date, format) => {
+    format = format.replace(/yyyy/g, date.getFullYear());
+    format = format.replace(/MM/g, ("0" + (date.getMonth() + 1)).slice(-2));
+    format = format.replace(/dd/g, ("0" + date.getDate()).slice(-2));
+    format = format.replace(/HH/g, ("0" + date.getHours()).slice(-2));
+    format = format.replace(/mm/g, ("0" + date.getMinutes()).slice(-2));
+    format = format.replace(/ss/g, ("0" + date.getSeconds()).slice(-2));
+    format = format.replace(/SSS/g, ("00" + date.getMilliseconds()).slice(-3));
+    return format;
+  };
+
+  const handleExport = () => {
+    // const uri = stageRef.current.toDataURL();
+    // console.log(uri);
+    downloadURI(stageRef.current.getStage().toDataURL({ mimeType: "image/png", quality: 1.0 }), formatDate(new Date(), "yyyyMMddHHmmssSSS") + ".png");
   };
 
   return (
@@ -65,13 +92,15 @@ const App = () => {
         }}
       />
       <label htmlFor="color">Color</label>
+      <button onClick={handleExport}>Save image</button>
       <Stage
         width={500}
         height={500}
         onMouseDown={handleMouseDown}
         onMousemove={handleMouseMove}
         onMouseup={handleMouseUp}
-        style={{ display: 'inline-block', border: "solid", marginTop: "1rem" }}
+        ref={stageRef}
+        style={{ display: "inline-block", border: "solid", marginTop: "1rem" }}
       >
         <Layer>
           {lines.map((line, i) => (
